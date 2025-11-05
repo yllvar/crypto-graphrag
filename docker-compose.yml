@@ -1,0 +1,111 @@
+services:
+  neo4j:
+    image: neo4j:5.14.0
+    container_name: crypto-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/Admin123
+      - NEO4J_PLUGINS='["apoc", "graph-data-science"]'
+      - NEO4J_dbms_security_auth__enabled=true
+      - NEO4J_dbms_connector_bolt_listen__address=:7687
+      - NEO4J_dbms_connector_http_listen__address=:7474
+      - NEO4J_dbms_connector_https_listen__address=:7473
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+      - "127.0.0.1:7473:7473"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "Admin123", "RETURN 1;"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - crypto-network
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    container_name: crypto-timescaledb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: crypto
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - crypto-network
+
+  redis:
+    image: redis:7.0
+    container_name: crypto-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - crypto-network
+
+  adminer:
+    image: adminer
+    container_name: crypto-adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - timescaledb
+    networks:
+      - crypto-network
+
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: crypto-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TIMESCALEDB_URI=postgresql+asyncpg://postgres:postgres@crypto-timescaledb:5432/crypto
+      - NEO4J_URI=bolt://crypto-neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=Admin123
+      - REDIS_URL=redis://crypto-redis:6379/0
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - crypto-network
+    command: sh -c "poetry install && poetry run uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000"
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_import:
+  timescaledb_data:
+  redis_data:
+
+networks:
+  crypto-network:
+    driver: bridge

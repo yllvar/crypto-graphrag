@@ -1,0 +1,36 @@
+# Core Dependencies
+fastapi
+uvicorn
+python-dotenv
+pydantic
+
+# Data Processing
+pandas
+numpy
+ccxt
+python-dateutil
+
+# Database
+neo4j
+asyncpg
+redis
+psycopg2-binary
+timescaledb
+
+# AI/ML
+langchain
+llama-index
+together
+sentence-transformers
+
+# Utilities
+loguru
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Testing
+pytest
+pytest-asyncio
+httpx
+pytest-cov
