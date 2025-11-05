@@ -95,8 +95,8 @@ graph TB
 
 1. Clone the repository and navigate to the project directory:
    ```bash
-   git clone https://github.com/your-org/graphrag-crypto.git
-   cd graphrag-crypto
+   git clone https://github.com/yllvar/crypto.-graphrag.git
+   cd crypto.-graphrag
    ```
 
 2. Copy the example environment file and update with your configuration:
