@@ -4,61 +4,67 @@ version = "0.1.0"
 description = "Agent-Based Graph RAG for Cryptocurrency Market Analysis"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
-packages = [
-    { include = "src" }
-]
+packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 
 # Core dependencies
-fastapi = "^0.110.0"
-uvicorn = {extras = ["standard"], version = "^0.27.0", python = ">=3.8"}
-python-dotenv = ">=1.0.0"
-pydantic = "^2.5.3"
-pydantic-settings = "^2.2.1"
+fastapi = "0.110.0"
+uvicorn = {extras = ["standard"], version = "0.27.0"}
+python-dotenv = "1.0.1"
+pydantic = "2.6.3"
+pydantic-settings = "2.2.1"
 
 # Security
-types-python-jose = "^3.3.7"  # For type hints with python-jose
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-python-multipart = "^0.0.9"
+python-jose = {extras = ["cryptography"], version = "3.3.0"}
+passlib = {extras = ["bcrypt"], version = "1.7.4"}
+python-multipart = "0.0.9"
 
 # Data processing
-pandas = "^2.1.0"
-numpy = "^1.26.0"
-python-dateutil = "^2.8.2"
-
-# Cryptocurrency and trading
-ccxt = "^4.1.13"
-
-# AI/ML
-together = "^1.0.0"
-langchain = "^0.1.0"
-llama-index = "^0.10.0"
-sentence-transformers = "^2.2.2"
+pandas = "2.1.4"
+numpy = "1.26.4"
+python-dateutil = "2.9.0"
 
 # Database
-neo4j = "^5.14.1"
-asyncpg = "^0.29.0"
-redis = "^5.0.1"
-psycopg2-binary = "^2.9.9"
+asyncpg = "0.29.0"
+redis = {extras = ["hiredis"], version = "5.0.1"}
+psycopg2-binary = "2.9.9"
+
+# Core AI/ML
+together = "1.5.30"
+langchain = {extras = ["llms"], version = "0.1.20"}
+llama-index = {extras = ["llms-llama-cpp"], version = "0.10.68"}
+
+# Optional Dependencies
+ccxt = {version = "4.5.15", optional = true}
+sentence-transformers = {version = "2.7.0", optional = true}
+neo4j = {version = "5.14.1", optional = true}
 
 # Utilities
-loguru = "^0.7.2"
-greenlet = "^3.0.1"
-pydantic-extra-types = "^2.1.0"
-certifi = "^2025.10.5"
+loguru = "0.7.2"
+greenlet = "3.0.3"
+pydantic-extra-types = "2.1.0"
+certifi = "2025.10.5"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.0.0"
-pytest-asyncio = "^0.21.1"
-pytest-cov = "^4.1.0"
-pytest-mock = "^3.12.0"
-pytest-xdist = "^3.3.1"
-httpx = "^0.25.0"
-freezegun = "^1.2.2"
-pytest-benchmark = "^5.2.1"
+pytest = "^8.1.0"
+pytest-asyncio = "0.21.1"
+pytest-cov = "4.1.0"
+pytest-mock = "3.12.0"
+pytest-xdist = "3.3.1"
+httpx = "0.25.0"
+freezegun = "1.2.2"
+pytest-benchmark = "5.2.1"
+types-python-jose = "^3.3.0"
+
+[tool.poetry.extras]
+full = ["ccxt", "sentence-transformers", "neo4j"]
+test = ["pytest", "pytest-asyncio", "pytest-cov", "pytest-mock", "pytest-xdist", "httpx", "freezegun", "pytest-benchmark"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -89,7 +95,3 @@ skip_empty = true
 [tool.coverage.html]
 directory = "coverage_html"
 title = "Crypto RAG Test Coverage"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
